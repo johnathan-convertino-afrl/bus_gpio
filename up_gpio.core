@@ -1,0 +1,31 @@
+CAPI=2:
+
+name: AFRL:device:up_gpio:1.0.0
+description: GPIO for wishbone or AXI4, register map matches Xilinx axi GPIO.
+
+filesets:
+  src:
+    files:
+      - src/up_gpio.v
+    file_type: verilogSource
+  
+  tb:
+    files:
+      - tb/tb_up_gpio.v
+    file_type: verilogSource
+    
+  dep:
+    depend:
+      - AFRL:utility:helper:1.0.0
+    
+targets:
+  default: &default
+    description: Default for IP intergration.
+    filesets: [src, dep]
+  
+  sim: &sim
+    <<: *default
+    description: Base simulation using icarus as default.
+    default_tool: icarus
+    filesets_append: [tb]
+    toplevel: tb_up_uart
