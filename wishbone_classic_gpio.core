@@ -25,9 +25,9 @@ targets:
     description: Default for IP intergration.
     filesets: [src, dep]
   
-  sim: &sim
-    <<: *default
-    description: Base simulation using icarus as default.
-    default_tool: icarus
-    filesets_append: [tb]
-    toplevel: tb_wishbone_slave
+  #sim: &sim
+    #<<: *default
+    #description: Base simulation using icarus as default.
+    #default_tool: icarus
+    #filesets_append: [tb]
+    #toplevel: tb_wishbone_slave

@@ -142,49 +142,76 @@ module tb_up_gpio();
       begin
         if(index < 2)
         begin
-          up_wreq <= 1'b1;
-          up_waddr <= GPIO_TRI;
-          up_wdata <= 'hFFFFFFFF;
+          up_wreq   <= 1'b1;
+          up_waddr  <= GPIO_TRI;
+          up_wdata  <= 'hFFFFFFFF;
         end else begin
         //read data
-          up_rreq <= 1'b1;
-          up_raddr <= GPIO_DATA;
+          up_rreq   <= 1'b1;
+          up_raddr  <= GPIO_DATA;
+          r_gpio_i  <= index;
         end
       //set to all output
       end else if(index < 1000)
       begin
         if(index < 502)
         begin
-          up_wreq <= 1'b1;
-          up_waddr <= GPIO_TRI;
-          up_wdata <= 'h00000000;
+          up_wreq   <= 1'b1;
+          up_waddr  <= GPIO_TRI;
+          up_wdata  <= 'h00000000;
         end else begin
         //write data
-          up_wreq <= 1'b1;
-          up_waddr <= GPIO_DATA;
-          up_wdata <= 'hBABEDEAD;
+          up_wreq   <= 1'b1;
+          up_waddr  <= GPIO_DATA;
+          up_wdata  <= 'hBABEDEAD;
         end
       end else if(index < 2000)
       begin
         //set to mix 50/50
         if(index < 1002)
         begin
-          up_wreq <= 1'b1;
-          up_waddr <= GPIO_TRI;
-          up_wdata <= 'h0000FFFF;
+          up_wreq   <= 1'b1;
+          up_waddr  <= GPIO_TRI;
+          up_wdata  <= 'hFF0000FF;
         //read data
         end else if(index < 1500) begin
-          up_rreq <= 1'b1;
+          up_rreq   <= 1'b1;
           up_raddr  <= GPIO_DATA;
+          r_gpio_i  <= index;
         //write data
         end else begin
           up_wreq <= 1'b1;
           up_waddr <= GPIO_DATA;
-          up_wdata <= 'hFFFFFFFF;
+          up_wdata <= (index << 8) | 'hFFFF00FF;
         end
       //irq testing
       end else begin
-        r_gpio_i <= index;
+        if(index < 2002)
+        begin
+          up_wreq   <= 1'b1;
+          up_waddr  <= GIER;
+          up_wdata  <= 'hFFFFFFFF;
+        end else if(index < 2004)
+        begin
+          up_wreq   <= 1'b1;
+          up_waddr  <= IP_IER;
+          up_wdata  <= 'hFFFFFFFF;
+        end else if(index < 3000)
+        begin
+          if((index % 10) == 0)
+          begin
+            r_gpio_i <= index;
+          end
+
+          if(irq == 1'b1)
+          begin
+            up_wreq   <= 1'b1;
+            up_waddr  <= IP_ISR;
+            up_wdata  <= 'h00000001;
+          end
+        end else begin
+          $finish();
+        end
       end
     end
   end
