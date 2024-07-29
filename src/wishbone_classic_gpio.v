@@ -53,12 +53,11 @@ module wishbone_classic_uart #(
     output  [BUS_WIDTH*8-1:0]   s_wb_data_o,
     output                      s_wb_err,
     //irq
-    output          irq,
-    //UART
-    output          tx,
-    input           rx,
-    output          rts,
-    input           cts
+    output                      irq,
+    //gpio
+    input   [GPIO_WIDTH-1:0]    gpio_io_i,
+    output  [GPIO_WIDTH-1:0]    gpio_io_o,
+    output  [GPIO_WIDTH-1:0]    gpio_io_t
   );
 
   //read interface

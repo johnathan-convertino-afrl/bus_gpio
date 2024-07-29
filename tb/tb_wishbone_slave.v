@@ -56,13 +56,19 @@ module tb_wishbone_slave #(
   wire tb_wb_ack;
   wire [31:0] tb_wb_data_i;
 
-  wire        tb_uart_loop;
+  wire tb_wb_err;
 
   wire up_rreq;
   wire up_wreq;
   wire [13:0] up_waddr;
   wire [13:0] up_raddr;
   wire [31:0] up_wdata;
+
+  //gpio
+  wire tb_irq;
+  wire [31:0] tb_gpio_o;
+  wire [31:0] tb_gpio_t;
+  reg  [31:0] tb_gpio_i;
   
   //1ns
   localparam CLK_PERIOD = 20;
@@ -75,35 +81,6 @@ module tb_wishbone_slave #(
   localparam ADDRESS_REG = 14'h4;
   localparam STATUS_REG  = 14'h8;
   localparam CONTROL_REG = 14'hC;
-
-  // //device under test
-  // up_wishbone #(
-  //   .WISHBONE_ADDRESS_WIDTH(16)
-  // ) dut (
-  //   //clk reset
-  //   .clk(tb_data_clk),
-  //   .rst(tb_rst),
-  //   //Wishbone
-  //   .s_wb_cyc(r_wb_cyc),
-  //   .s_wb_stb(r_wb_stb),
-  //   .s_wb_we(r_wb_we),
-  //   .s_wb_addr(r_wb_addr),
-  //   .s_wb_data_i(r_wb_data_o),
-  //   .s_wb_sel_i(r_wb_sel_o),
-  //   .s_wb_ack(tb_wb_ack),
-  //   .s_wb_data_o(tb_wb_data_i),
-  //   //uP
-  //   //read interface
-  //   .up_rreq(up_rreq),
-  //   .up_rack(r_up_rack),
-  //   .up_raddr(up_raddr),
-  //   .up_rdata(r_up_rdata),
-  //   //write interface
-  //   .up_wreq(up_wreq),
-  //   .up_wack(r_up_wack),
-  //   .up_waddr(up_waddr),
-  //   .up_wdata(up_wdata)
-  // );
 
   
   //axis clock
@@ -163,16 +140,10 @@ module tb_wishbone_slave #(
 
   //device under test
   wishbone_classic_uart #(
-    .BAUD_CLOCK_SPEED(CLK_SPEED_HZ),
-    .BAUD_RATE(115200),
-    .PARITY_ENA(0),
-    .PARITY_TYPE(0),
-    .STOP_BITS(1),
-    .DATA_BITS(8),
-    .RX_DELAY(2),
-    .RX_BAUD_DELAY(2),
-    .TX_DELAY(2),
-    .TX_BAUD_DELAY(0)
+    .ADDRESS_WIDTH(32),
+    .BUS_WIDTH(4),
+    .GPIO_WIDTH(32),
+    .IRQ_ENABLE(0)
   ) dut (
     //clock and reset
     .clk(tb_data_clk),
@@ -188,10 +159,13 @@ module tb_wishbone_slave #(
     .s_wb_bte(2'b00),
     .s_wb_ack(tb_wb_ack),
     .s_wb_data_o(tb_wb_data_i),
-    //uart
-    .tx(tb_uart_loop),
-    .rx(tb_uart_loop),
-    .rts(),
-    .cts(1'b1)
+    .s_wb_err(tb_wb_err),
+    //gpio
+    .irq(tb_irq),
+    //gpio
+    .gpio_io_i(tb_gpio_i),
+    .gpio_io_o(tb_gpio_o),
+    .gpio_io_t(tb_gpio_t)
   );
+
 endmodule
