@@ -1,11 +1,11 @@
 //******************************************************************************
-/// @file    tb_up_uart.v
+/// @file    tb_up_gpio.v
 /// @author  JAY CONVERTINO
-/// @date    2024.02.29
-/// @brief   TEST BENCH FOR UP UART
+/// @date    2024.07.29
+/// @brief   TEST BENCH FOR UP GPIO
 ///
 /// @LICENSE MIT
-///  Copyright 2021 Jay Convertino
+///  Copyright 2024 Jay Convertino
 ///
 ///  Permission is hereby granted, free of charge, to any person obtaining a copy
 ///  of this software and associated documentation files (the "Software"), to 
@@ -28,7 +28,7 @@
 
 `timescale 1 ns/10 ps
 
-module tb_up_uart ();
+module tb_up_gpio();
   
   //1ns
   localparam CLK_PERIOD = 20;
@@ -41,38 +41,30 @@ module tb_up_uart ();
   reg         clk = 0;
   reg         rstn = 0;
 
-  wire        tx;
-  wire        rx;
-  wire        rts;
-  wire        cts;
   wire        irq;
+
+  reg   [31:0]  r_gpio_i;
+  wire  [31:0]  s_gpio_o;
+  wire  [31:0]  s_gpio_t;
 
   //read interface
   reg           up_rreq;
   wire          up_rack;
-  reg   [13:0]  up_raddr;
+  reg   [31:0]  up_raddr;
   wire  [31:0]  up_rdata;
   //write interface
   reg           up_wreq;
   wire          up_wack;
-  reg   [13:0]  up_waddr;
+  reg   [31:0]  up_waddr;
   reg   [31:0]  up_wdata;
 
-  assign rx = tx;
-  assign cts = rts;
-
   //device under test
-  up_uart #(
-    .CLOCK_SPEED(CLK_SPEED_HZ),
-    .BAUD_RATE(115200),
-    .PARITY_ENA(0),
-    .PARITY_TYPE(0),
-    .STOP_BITS(1),
-    .DATA_BITS(8),
-    .RX_DELAY(3),
-    .RX_BAUD_DELAY(3),
-    .TX_DELAY(2),
-    .TX_BAUD_DELAY(0)
+  //UP GPIO
+  up_gpio #(
+    .ADDRESS_WIDTH(32),
+    .BUS_WIDTH(4),
+    .GPIO_WIDTH(32),
+    .IRQ_ENABLE(0)
   ) dut (
     //axis clock and reset
     .clk(clk),
@@ -90,12 +82,12 @@ module tb_up_uart ();
     .up_wdata(up_wdata),
     //irq
     .irq(irq),
-    //UART
-    .tx(tx),
-    .rx(rx),
-    .rts(rts),
-    .cts(cts)
+    //gpio
+    .gpio_io_i(r_gpio_i),
+    .gpio_io_o(s_gpio_o),
+    .gpio_io_t(s_gpio_t)
   );
+
 
   //clock
   always
@@ -119,6 +111,7 @@ module tb_up_uart ();
   begin
     if(rstn == 1'b0)
     begin
+      r_gpio_i  <= 'hDEADBEEF;
       up_rreq   <= 1'b0;
       up_raddr  <= 0;
 
@@ -129,33 +122,20 @@ module tb_up_uart ();
       up_wreq  <= 1'b0;
       up_waddr <= 0;
 
-      if(index < 6)
-      begin
-        up_wreq   <= 1'b1;
-        up_waddr  <= 'h4;
-        if(up_wack == 1'b1)
-        begin
-          up_wdata  <= up_wdata + 'h01;
-          index = index + 1;
-        end
-      end else if(index > 400)
-      begin
-        up_rreq   <= 1'b1;
-        up_raddr  <= 'h0;
-        if(up_rack == 1'b1)
-        begin
-          index = index + 1;
-        end
-      end else begin
-        index = index + 1;
-      end
+      //set to all input
+      //read data
+      //set to all output
+      //write data
+      //set to mix 50/50
+      //read data
+      //write data
     end
   end
 
   //copy pasta, fst generation
   initial
   begin
-    $dumpfile("tb_up_uart.fst");
-    $dumpvars(0,tb_up_uart);
+    $dumpfile("tb_up_gpio.fst");
+    $dumpvars(0,tb_up_gpio);
   end
 endmodule

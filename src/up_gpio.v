@@ -57,7 +57,6 @@ module up_gpio #(
     input   [GPIO_WIDTH-1:0]    gpio_io_i,
     output  [GPIO_WIDTH-1:0]    gpio_io_o,
     output  [GPIO_WIDTH-1:0]    gpio_io_t
-
   );
 
   //register address decoding
@@ -81,7 +80,6 @@ module up_gpio #(
 
   //interrupt
   reg                       r_irq;
-  reg                       r_irq_en;
 
   //registers
   reg   [GPIO_WIDTH-1:0]    r_gpio_i;
@@ -140,16 +138,16 @@ module up_gpio #(
             r_up_rdata <= 0;
           end
           GIER: begin
-            r_up_data     <= 0;
-            r_up_data[31] <= r_gie & IRQ_ENABLE;
+            r_up_rdata     <= 0;
+            r_up_rdata[31] <= r_gie & IRQ_ENABLE;
           end
           IP_IER: begin
-            r_up_data     <= 0;
-            r_up_data[0]  <= r_ch1_irq_ena & IRQ_ENABLE;
+            r_up_rdata     <= 0;
+            r_up_rdata[0]  <= r_ch1_irq_ena & IRQ_ENABLE;
           end
           IP_ISR: begin
-            r_up_data         <= 0;
-            r_up_data[0]      <= r_ch1_irq_status & IRQ_ENABLE;
+            r_up_rdata         <= 0;
+            r_up_rdata[0]      <= r_ch1_irq_status & IRQ_ENABLE;
           end
           default:begin
             r_up_rdata <= 0;
@@ -189,6 +187,7 @@ module up_gpio #(
     end
   end
 
+  //irq
   always @(posedge clk)
   begin
     if(rstn == 1'b0)
@@ -207,13 +206,13 @@ module up_gpio #(
 
       if((r_gpio_i != (gpio_io_i & r_gpio_tri)) && IRQ_ENABLE && (r_gie == 1'b1))
       begin
-        r_irq <= r_ch1_irq_ena
+        r_irq <= r_ch1_irq_ena;
       end
 
       if(rr_ch1_irq_status != r_ch1_irq_status)
       begin
         r_irq <= 1'b0;
-      begin
+      end
     end
   end
 endmodule

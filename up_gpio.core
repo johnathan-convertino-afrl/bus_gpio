@@ -28,4 +28,4 @@ targets:
     description: Base simulation using icarus as default.
     default_tool: icarus
     filesets_append: [tb]
-    toplevel: tb_up_uart
+    toplevel: tb_up_gpio
