@@ -36,6 +36,14 @@ module tb_up_gpio();
   localparam RST_PERIOD = 500;
   localparam CLK_SPEED_HZ = 1000000000/CLK_PERIOD;
 
+  localparam GPIO_DATA  = 12'h000;
+  localparam GPIO_TRI   = 12'h004;
+  localparam GPIO2_DATA = 12'h008;
+  localparam GPIO2_TRI  = 12'h00C;
+  localparam GIER       = 12'h11C;
+  localparam IP_IER     = 12'h128;
+  localparam IP_ISR     = 12'h120;
+
   integer     index = 0;
 
   reg         clk = 0;
@@ -64,7 +72,7 @@ module tb_up_gpio();
     .ADDRESS_WIDTH(32),
     .BUS_WIDTH(4),
     .GPIO_WIDTH(32),
-    .IRQ_ENABLE(0)
+    .IRQ_ENABLE(1)
   ) dut (
     //axis clock and reset
     .clk(clk),
@@ -87,7 +95,6 @@ module tb_up_gpio();
     .gpio_io_o(s_gpio_o),
     .gpio_io_t(s_gpio_t)
   );
-
 
   //clock
   always
@@ -115,20 +122,70 @@ module tb_up_gpio();
       up_rreq   <= 1'b0;
       up_raddr  <= 0;
 
+      index     <= 0;
+
       up_wreq   <= 1'b0;
       up_waddr  <= 0;
-      up_wdata  <= 'hBE;
+      up_wdata  <= 0;
     end else begin
       up_wreq  <= 1'b0;
       up_waddr <= 0;
+      up_wdata <= 0;
+
+      up_rreq  <= 1'b0;
+      up_raddr <= 0;
+
+      index <= index + 1;
 
       //set to all input
-      //read data
+      if(index < 500)
+      begin
+        if(index < 2)
+        begin
+          up_wreq <= 1'b1;
+          up_waddr <= GPIO_TRI;
+          up_wdata <= 'hFFFFFFFF;
+        end else begin
+        //read data
+          up_rreq <= 1'b1;
+          up_raddr <= GPIO_DATA;
+        end
       //set to all output
-      //write data
-      //set to mix 50/50
-      //read data
-      //write data
+      end else if(index < 1000)
+      begin
+        if(index < 502)
+        begin
+          up_wreq <= 1'b1;
+          up_waddr <= GPIO_TRI;
+          up_wdata <= 'h00000000;
+        end else begin
+        //write data
+          up_wreq <= 1'b1;
+          up_waddr <= GPIO_DATA;
+          up_wdata <= 'hBABEDEAD;
+        end
+      end else if(index < 2000)
+      begin
+        //set to mix 50/50
+        if(index < 1002)
+        begin
+          up_wreq <= 1'b1;
+          up_waddr <= GPIO_TRI;
+          up_wdata <= 'h0000FFFF;
+        //read data
+        end else if(index < 1500) begin
+          up_rreq <= 1'b1;
+          up_raddr  <= GPIO_DATA;
+        //write data
+        end else begin
+          up_wreq <= 1'b1;
+          up_waddr <= GPIO_DATA;
+          up_wdata <= 'hFFFFFFFF;
+        end
+      //irq testing
+      end else begin
+        r_gpio_i <= index;
+      end
     end
   end
 
