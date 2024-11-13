@@ -1,5 +1,8 @@
 # BUS GPIO
 ### GPIO TO BUS (WISHBONE CLASSIC, AXI_LITE)
+
+![image](docs/manual/img/AFRL.png)
+
 ---
 
    author: Jay Convertino   
@@ -19,7 +22,13 @@
 #### Previous
   - none
 
-### Dependencies
+### DOCUMENTATION
+  For detailed usage information, please navigate to one of the following sources. They are the same, just in a different format.
+
+  - [bus_gpio.pdf](docs/manual/bus_gpio.pdf)
+  - [github page](https://johnathan-convertino-afrl.github.io/bus_gpio/)
+
+### DEPENDENCIES
 #### Build
   - AFRL:utility:helper:1.0.0
   - AFRL:bus:up_wishbone_classic:1.0.0 (FOR WISHBONE)
@@ -28,18 +37,14 @@
 #### Simulation
   - AFRL:simulation:axis_stimulator
 
-### IP USAGE
-#### INSTRUCTIONS
+### PARAMETERS
 
-  GPIO core is for general purpose input and output modeled after the AXI Xilinx core. This core does not have GPIO2 functionality, only GPIO.
+ *   ADDRESS_WIDTH   - Width of the address bus in bits.
+ *   BUS_WIDTH       - Width of the data bus in bytes.
+ *   GPIO_WIDTH      - Width of the GPIO for inputs and outputs
+ *   IRQ_ENABLE      - Enable interrupt
 
-#### PARAMETERS
-
-  * ADDRESS_WIDTH : DEFAULT = 32 : Width of the Address porition of the bus.
-  * GPIO_WIDTH : DEFAULT = 32 : Width of the GPIO in, out, and tristate. Can not be larger than the data width (fixed at 32 bits).
-  * IRQ_ENABLE : DEFAULT = 0 : Disable or enable pin change interrupt for inputs. 0 is disabled, 1 is enabled.
-
-#### REGISTERS
+### REGISTERS
 
   - 0x000 = GPIO_DATA (R/W)
     * GPIO_WIDTH bit register, GPIO_WIDTH downto 0 hold GPIO data, or for writing GPIO data.
@@ -47,10 +52,10 @@
     * GPIO_WIDTH bit register, GPIO_WIDTH downto 0 hold GPIO pin state. 0 for output, 1 for input.
   - 0x11C = GIER (R/W)
     * 32 bit (or larger) register with the following bits: 31= Enable Global Interrupt, rest are always 0.
-  - 0x128 = IP Interrupt enable (R/W)
-    * 32 bit (or larger) register with the following bits: 0 = GPIO IRQ Enable, rest are always 0.
   - 0x120 = IP Interrupt status (R/TOW)
     * 32 bit (or larger) register with the following bits: 0 = GPIO IRQ status, write 1 to toggel. Rest are always 0.
+  - 0x128 = IP Interrupt enable (R/W)
+    * 32 bit (or larger) register with the following bits: 0 = GPIO IRQ Enable, rest are always 0.
 
 * This core ignores Xilinx GPIO 2 registers, similar to the way it works if they are disabled.
 
@@ -66,12 +71,12 @@
 * tb_up_gpio.v
 * tb_wishbone_slave.v
   
-### fusesoc
+### FUSESOC
 
 * fusesoc_info.core created.
 * Simulation uses icarus to run data through the core.
 
-#### TARGETS
+#### targets
 
 * RUN WITH: (fusesoc run --target=sim VENDER:CORE:NAME:VERSION)
   - default (for IP integration builds)

@@ -1,35 +1,67 @@
 //******************************************************************************
-/// @FILE    up_gpio.v
-/// @AUTHOR  JAY CONVERTINO
-/// @DATE    2024.07.25
-/// @BRIEF   AXIS GPIO
-/// @DETAILS Core for interfacing with simple GPIO I/O.
-///
-///  @LICENSE MIT
-///  Copyright 2024 Jay Convertino
-///
-///  Permission is hereby granted, free of charge, to any person obtaining a copy
-///  of this software and associated documentation files (the "Software"), to 
-///  deal in the Software without restriction, including without limitation the
-///  rights to use, copy, modify, merge, publish, distribute, sublicense, and/or 
-///  sell copies of the Software, and to permit persons to whom the Software is 
-///  furnished to do so, subject to the following conditions:
-///
-///  The above copyright notice and this permission notice shall be included in 
-///  all copies or substantial portions of the Software.
-///
-///  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-///  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-///  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-///  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-///  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-///  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
-///  IN THE SOFTWARE.
+// file:    up_gpio.v
+//
+// author:  JAY CONVERTINO
+//
+// date:    2024/07/25
+//
+// about:   Brief
+// uP Core for interfacing with general purpose input/output.
+//
+// license: License MIT
+// Copyright 2024 Jay Convertino
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//
 //******************************************************************************
 
 `timescale 1ns/100ps
 
-//UP GPIO
+/*
+ * Module: up_gpio
+ *
+ * uP based GPIO device.
+ *
+ * Parameters:
+ *
+ *   ADDRESS_WIDTH   - Width of the uP address port.
+ *   BUS_WIDTH       - Width of the uP bus data port.
+ *   GPIO_WIDTH      - Width of the GPIO for inputs and outputs
+ *   IRQ_ENABLE      - Enable interrupt
+ *
+ * Ports:
+ *
+ *   clk            - Clock for all devices in the core
+ *   rstn           - Negative reset
+ *   up_rreq        - uP bus read request
+ *   up_rack        - uP bus read ack
+ *   up_raddr       - uP bus read address
+ *   up_rdata       - uP bus read data
+ *   up_wreq        - uP bus write request
+ *   up_wack        - uP bus write ack
+ *   up_waddr       - uP bus write address
+ *   up_wdata       - uP bus write data
+ *   irq            - Interrupt when data is received
+ *   gpio_io_i      - Input for GPIO
+ *   gpio_io_o      - Output for GPIO
+ *   gpio_io_t      - Tristate for GPIO
+ */
 module up_gpio #(
     parameter ADDRESS_WIDTH   = 32,
     parameter BUS_WIDTH       = 4,
@@ -37,41 +69,68 @@ module up_gpio #(
     parameter IRQ_ENABLE      = 0
   ) 
   (
-    //clock and reset
     input           clk,
     input           rstn,
-    //UP interface
-    //read interface
     input                       up_rreq,
     output                      up_rack,
     input   [ADDRESS_WIDTH-1:0] up_raddr,
     output  [(BUS_WIDTH*8)-1:0] up_rdata,
-    //write interface
     input                       up_wreq,
     output                      up_wack,
     input   [ADDRESS_WIDTH-1:0] up_waddr,
     input   [(BUS_WIDTH*8)-1:0] up_wdata,
-    //irq
     output                      irq,
-    //gpio
     input   [GPIO_WIDTH-1:0]    gpio_io_i,
     output  [GPIO_WIDTH-1:0]    gpio_io_o,
     output  [GPIO_WIDTH-1:0]    gpio_io_t
   );
 
-  //register address decoding
+  // Group: Register Information
+  // Core has 4 registers at the offsets that follow.
+  //
+  //  <GPIO_DATA>   - h000
+  //  <GPIO_TRI>    - h004
+  //  <GPIO2_DATA>  - h008 N/A
+  //  <GPIO2_TRI>   - h00C N/A
+  //  <GIER>        - h11C
+  //  <IP_ISR>      - h120
+  //  <IP_IER>      - h128
+
+  // Register Address: GPIO_DATA
+  // Defines the address offset for GPIO DATA
+  // (see diagrams/reg_GPIO_DATA.png)
+  // Valid bits are from GPIO_WIDTH:0, input or output data.
   localparam GPIO_DATA  = 12'h000;
+  // Register Address: GPIO_TRI
+  // Defines the address offset for GPIO TRI.
+  // (see diagrams/reg_GPIO_TRI.png)
+  // Valid bits are from GPIO_WIDTH:0, 1 indicates input, 0 is output.
   localparam GPIO_TRI   = 12'h004;
+  // Register Address: GPIO2_DATA
+  // Defines the address offset for GPIO2 DATA
+  // (see diagrams/reg_GPIO2_DATA.png)
+  // Valid bits are from GPIO2_WIDTH:0, input or output data. This Register is not implimented in this design.
   localparam GPIO2_DATA = 12'h008;
+  // Register Address: GPIO2_TRI
+  // Defines the address offset for GPIO2 TRI.
+  // (see diagrams/reg_GPIO2_TRI.png)
+  // Valid bits are from GPIO2_WIDTH:0, 1 indicates input, 0 is output. This register is not implimented in this design.
   localparam GPIO2_TRI  = 12'h00C;
+  // Register Address: GIER
+  // Defines the address offset for GIER.
+  // (see diagrams/reg_GIER.png)
+  // Bit 31 is the Global interrupt enable. Write a 1 to enable interrupts.
   localparam GIER       = 12'h11C;
-  localparam IP_IER     = 12'h128;
+  // Register Address: IP_ISR
+  // Defines the address offset for IP_ISR.
+  // (see diagrams/reg_IP_ISR.png)
+  // Bit 0 is GPIO IRQ status, On write this will toggle(acknowledge) the interrupt.
   localparam IP_ISR     = 12'h120;
-
-
-  localparam ENABLE_INTR_BIT  = 4;
-  localparam RESET_RX_BIT     = 1;
-  localparam RESET_TX_BIT     = 0;
+  // Register Address: IP_IER
+  // Defines the address offset to set the control bits.
+  // (see diagrams/reg_IP_IER.png)
+  // Bit 0 is GPIO IRQ enable interrupt. Write a 1 to bit 0 to enable interrupt.
+  localparam IP_IER     = 12'h128;
 
   //up registers
   reg                       r_up_rack;

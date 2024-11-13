@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ip_",["RegisterAddress"],[["IP_IER",,[["up_gpio",,,,0,"File:up_gpio.v:up_gpio.IP_IER","SystemVerilogModule:up_gpio:IP_IER"]]],["IP_ISR",,[["up_gpio",,,,0,"File:up_gpio.v:up_gpio.IP_ISR","SystemVerilogModule:up_gpio:IP_ISR"]]]]);

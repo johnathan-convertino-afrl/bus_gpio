@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("axi",["Module","File"],[["axi_lite_gpio",,[[,,,,0,"File:axi_lite_gpio.v:axi_lite_gpio","SystemVerilogModule:axi_lite_gpio"],[,"axi_lite_gpio.v",,,1,"File:axi_lite_gpio.v:axi_lite_gpio.v"]]]]);
