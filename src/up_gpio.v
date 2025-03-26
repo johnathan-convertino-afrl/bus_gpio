@@ -73,11 +73,11 @@ module up_gpio #(
     input                                       rstn,
     input                                       up_rreq,
     output                                      up_rack,
-    input   [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0]   up_raddr,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]   up_raddr,
     output  [(BUS_WIDTH*8)-1:0]                 up_rdata,
     input                                       up_wreq,
     output                                      up_wack,
-    input   [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0]   up_waddr,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]   up_waddr,
     input   [(BUS_WIDTH*8)-1:0]                 up_wdata,
     output                                      irq,
     input   [GPIO_WIDTH-1:0]                    gpio_io_i,
@@ -86,7 +86,7 @@ module up_gpio #(
   );
   // var: DIVISOR
   // Divide the address register default location for 1 byte access to multi byte access. (register offsets are byte offsets).
-  localparam DIVISOR = BUS_WIDTH-1;
+  localparam DIVISOR = BUS_WIDTH/2;
 
   // Group: Register Information
   // Core has 4 registers at the offsets that follow.
