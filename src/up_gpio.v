@@ -40,7 +40,7 @@
  *
  * Parameters:
  *
- *   ADDRESS_WIDTH   - Width of the uP address port.
+ *   ADDRESS_WIDTH   - Width of the uP address port, max 32 bit.
  *   BUS_WIDTH       - Width of the uP bus data port.
  *   GPIO_WIDTH      - Width of the GPIO for inputs and outputs
  *   IRQ_ENABLE      - Enable interrupt
@@ -69,21 +69,24 @@ module up_gpio #(
     parameter IRQ_ENABLE      = 0
   ) 
   (
-    input           clk,
-    input           rstn,
-    input                       up_rreq,
-    output                      up_rack,
-    input   [ADDRESS_WIDTH-1:0] up_raddr,
-    output  [(BUS_WIDTH*8)-1:0] up_rdata,
-    input                       up_wreq,
-    output                      up_wack,
-    input   [ADDRESS_WIDTH-1:0] up_waddr,
-    input   [(BUS_WIDTH*8)-1:0] up_wdata,
-    output                      irq,
-    input   [GPIO_WIDTH-1:0]    gpio_io_i,
-    output  [GPIO_WIDTH-1:0]    gpio_io_o,
-    output  [GPIO_WIDTH-1:0]    gpio_io_t
+    input                                       clk,
+    input                                       rstn,
+    input                                       up_rreq,
+    output                                      up_rack,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0]   up_raddr,
+    output  [(BUS_WIDTH*8)-1:0]                 up_rdata,
+    input                                       up_wreq,
+    output                                      up_wack,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0]   up_waddr,
+    input   [(BUS_WIDTH*8)-1:0]                 up_wdata,
+    output                                      irq,
+    input   [GPIO_WIDTH-1:0]                    gpio_io_i,
+    output  [GPIO_WIDTH-1:0]                    gpio_io_o,
+    output  [GPIO_WIDTH-1:0]                    gpio_io_t
   );
+  // var: DIVISOR
+  // Divide the address register default location for 1 byte access to multi byte access. (register offsets are byte offsets).
+  localparam DIVISOR = BUS_WIDTH-1;
 
   // Group: Register Information
   // Core has 4 registers at the offsets that follow.
@@ -100,37 +103,37 @@ module up_gpio #(
   // Defines the address offset for GPIO DATA
   // (see diagrams/reg_GPIO_DATA.png)
   // Valid bits are from GPIO_WIDTH:0, input or output data.
-  localparam GPIO_DATA  = 12'h000;
+  localparam GPIO_DATA  = 12'h000 >> DIVISOR;
   // Register Address: GPIO_TRI
   // Defines the address offset for GPIO TRI.
   // (see diagrams/reg_GPIO_TRI.png)
   // Valid bits are from GPIO_WIDTH:0, 1 indicates input, 0 is output.
-  localparam GPIO_TRI   = 12'h004;
+  localparam GPIO_TRI   = 12'h004 >> DIVISOR;
   // Register Address: GPIO2_DATA
   // Defines the address offset for GPIO2 DATA
   // (see diagrams/reg_GPIO2_DATA.png)
   // Valid bits are from GPIO2_WIDTH:0, input or output data. This Register is not implimented in this design.
-  localparam GPIO2_DATA = 12'h008;
+  localparam GPIO2_DATA = 12'h008 >> DIVISOR;
   // Register Address: GPIO2_TRI
   // Defines the address offset for GPIO2 TRI.
   // (see diagrams/reg_GPIO2_TRI.png)
   // Valid bits are from GPIO2_WIDTH:0, 1 indicates input, 0 is output. This register is not implimented in this design.
-  localparam GPIO2_TRI  = 12'h00C;
+  localparam GPIO2_TRI  = 12'h00C >> DIVISOR;
   // Register Address: GIER
   // Defines the address offset for GIER.
   // (see diagrams/reg_GIER.png)
   // Bit 31 is the Global interrupt enable. Write a 1 to enable interrupts.
-  localparam GIER       = 12'h11C;
+  localparam GIER       = 12'h11C >> DIVISOR;
   // Register Address: IP_ISR
   // Defines the address offset for IP_ISR.
   // (see diagrams/reg_IP_ISR.png)
   // Bit 0 is GPIO IRQ status, On write this will toggle(acknowledge) the interrupt.
-  localparam IP_ISR     = 12'h120;
+  localparam IP_ISR     = 12'h120 >> DIVISOR;
   // Register Address: IP_IER
   // Defines the address offset to set the control bits.
   // (see diagrams/reg_IP_IER.png)
   // Bit 0 is GPIO IRQ enable interrupt. Write a 1 to bit 0 to enable interrupt.
-  localparam IP_IER     = 12'h128;
+  localparam IP_IER     = 12'h128 >> DIVISOR;
 
   //up registers
   reg                       r_up_rack;

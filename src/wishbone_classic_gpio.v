@@ -39,7 +39,7 @@
  *
  * Parameters:
  *
- *   ADDRESS_WIDTH   - Width of the address bus in bits.
+ *   ADDRESS_WIDTH   - Width of the address bus in bits, max 32 bit.
  *   BUS_WIDTH       - Width of the data bus in bytes.
  *   GPIO_WIDTH      - Width of the GPIO for inputs and outputs
  *   IRQ_ENABLE      - Enable interrupt
@@ -98,7 +98,7 @@ module wishbone_classic_gpio #(
   wire                      up_rack;
   // var: up_raddr
   // uP read bus address
-  wire  [ADDRESS_WIDTH-3:0] up_raddr;
+  wire  [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0] up_raddr;
   // var: up_rdata
   // uP read bus request
   wire  [31:0]              up_rdata;
@@ -111,7 +111,7 @@ module wishbone_classic_gpio #(
   wire                      up_wack;
   // var: up_waddr
   // uP write bus address
-  wire  [ADDRESS_WIDTH-3:0] up_waddr;
+  wire  [ADDRESS_WIDTH-(BUS_WIDTH-1)-1:0] up_waddr;
   // var: up_wdata
   // uP write bus data
   wire  [31:0]              up_wdata;
