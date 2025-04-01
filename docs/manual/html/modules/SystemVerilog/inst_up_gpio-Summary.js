@@ -1,1 +1,1 @@
-﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_up_gpio","inst_up_gpio");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_up_gpio",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[20,0,0,"inst_up_gpio"]]);
+﻿NDFramePage.OnPageTitleLoaded("SystemVerilogModule:inst_up_gpio","inst_up_gpio");NDSummary.OnSummaryLoaded("SystemVerilogModule:inst_up_gpio",[["SystemVerilog","SystemVerilog"]],[["Modules","Module"]],[[61,0,0,"inst_up_gpio"]]);

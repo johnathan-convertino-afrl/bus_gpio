@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("div",["Variable"],[["DIVISOR",,[["up_gpio",,,,0,"File:up_gpio.v:up_gpio.DIVISOR","SystemVerilogModule:up_gpio:DIVISOR"]]]]);

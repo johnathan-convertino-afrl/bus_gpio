@@ -139,7 +139,7 @@ module tb_wishbone_slave #(
   end
 
   //device under test
-  wishbone_classic_uart #(
+  wishbone_standard_gpio #(
     .ADDRESS_WIDTH(32),
     .BUS_WIDTH(4),
     .GPIO_WIDTH(32),

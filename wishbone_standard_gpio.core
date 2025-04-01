@@ -1,18 +1,18 @@
 CAPI=2:
 
-name: AFRL:device:wishbone_classic_gpio:1.0.0
+name: AFRL:device:wishbone_standard_gpio:1.0.0
 description: GPIO for wishbone, register map matches Xilinx axi GPIO.
 
 filesets:
   src:
     files:
-      - src/wishbone_classic_gpio.v
+      - src/wishbone_standard_gpio.v
     file_type: verilogSource
 
   tb_cocotb:
     files:
-      - tb/tb_cocotb_wishbone_classic.py : {file_type : user, copyto : .}
-      - tb/tb_cocotb_wishbone_classic.v : { file_type: verilogSource }
+      - tb/tb_cocotb_wishbone_standard.py : {file_type : user, copyto : .}
+      - tb/tb_cocotb_wishbone_standard.v : { file_type: verilogSource }
   
   tb:
     files:
@@ -23,7 +23,7 @@ filesets:
     depend:
       - AFRL:utility:helper:1.0.0
       - AFRL:device:up_gpio:1.0.0
-      - AFRL:bus:up_wishbone_classic:1.0.0
+      - AFRL:bus:up_wishbone_standard:1.0.0
     
 targets:
   default: &default

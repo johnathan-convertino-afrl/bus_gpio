@@ -28,7 +28,7 @@
 
 \par
 BUS GPIO is a core for interfacing over generic input/output to a bus of choice. The data can then be accessed over a BUS,
-currently AXI lite or Wishbone Classic, and processed as needed. All input and output over the bus goes out directly to the IO.
+currently AXI lite or Wishbone Standard, and processed as needed. All input and output over the bus goes out directly to the IO.
 The following is information on how to use the device in an FPGA, software, and in simulation.
 
 \subsection{Dependencies}
@@ -44,7 +44,7 @@ The following are the dependencies of the cores.
 
 \input{src/fusesoc/depend_axi_lite_gpio.tex}
 
-\input{src/fusesoc/depend_wishbone_classic_gpio.tex}
+\input{src/fusesoc/depend_wishbone_standard_gpio.tex}
 
 \input{src/fusesoc/depend_up_gpio.tex}
 
@@ -58,7 +58,7 @@ to be routed.
 This core is made up of other cores that are documented in detail in there source. The cores this is made up of are the,
 \begin{itemize}
   \item \textbf{up\_axi} An AXI Lite to uP converter core (see core for documentation).
-  \item \textbf{up\_wishbone\_classic} A wishbone classic to uP converter core (see core for documentation).
+  \item \textbf{up\_wishbone\_standard} A wishbone standard to uP converter core (see core for documentation).
   \item \textbf{up\_gpio} Takes uP bus and coverts it to interface with general purpose input/output (see module documentation for information \ref{Module Documentation}).
 \end{itemize}
 
@@ -80,7 +80,7 @@ a system and should be integrated into a fusesoc based system. Simulations are s
 
 \input{src/fusesoc/files_axi_lite_gpio.tex}
 
-\input{src/fusesoc/files_wishbone_classic_gpio.tex}
+\input{src/fusesoc/files_wishbone_standard_gpio.tex}
 
 \input{src/fusesoc/files_up_gpio.tex}
 
@@ -88,7 +88,7 @@ a system and should be integrated into a fusesoc based system. Simulations are s
 
 \input{src/fusesoc/targets_axi_lite_gpio.tex}
 
-\input{src/fusesoc/targets_wishbone_classic_gpio.tex}
+\input{src/fusesoc/targets_wishbone_standard_gpio.tex}
 
 \input{src/fusesoc/targets_up_gpio.tex}
 
@@ -138,8 +138,8 @@ axi\_lite\_gpio module adds a AXI Lite to uP (microprocessor) bus converter. The
 from Analog Devices.
 
 \par
-wishbone\_classic\_gpio module adds a Wishbone Classic to uP (microprocessor) bus converter. This
-converter was designed for Wishbone Classic only, NOT pipelined.
+wishbone\_standard\_gpio module adds a Wishbone Standard to uP (microprocessor) bus converter. This
+converter was designed for Wishbone Standard only, NOT pipelined.
 
 \vspace{15mm}
 \par

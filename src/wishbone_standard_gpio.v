@@ -1,12 +1,12 @@
 //******************************************************************************
-//  file:     wishbone_classic_gpio.v
+//  file:     wishbone_standard_gpio.v
 //
 //  author:   JAY CONVERTINO
 //
 //  date:     2024/07/25
 //
 //  about:    Brief
-//  Wishbone classic UART core.
+//  Wishbone standard UART core.
 //
 //  license: License MIT
 //  Copyright 2024 Jay Convertino
@@ -33,9 +33,9 @@
 `timescale 1ns/100ps
 
 /*
- * Module: wishbone_classic_gpio
+ * Module: wishbone_standard_gpio
  *
- * AXI Lite based uart device.
+ * Wishbone Classic Standard based uart device.
  *
  * Parameters:
  *
@@ -62,7 +62,7 @@
  *   gpio_io_o      - Output for GPIO
  *   gpio_io_t      - Tristate for GPIO
  */
-module wishbone_classic_gpio #(
+module wishbone_standard_gpio #(
     parameter ADDRESS_WIDTH   = 32,
     parameter BUS_WIDTH       = 4,
     parameter GPIO_WIDTH      = 32,
@@ -114,13 +114,13 @@ module wishbone_classic_gpio #(
 
   //Group: Instantianted Modules
 
-  // Module: inst_up_wishbone_classic
+  // Module: inst_up_wishbone_standard
   //
-  // Module instance of up_wishbone_classic for the Wishbone Classic bus to the uP bus.
-  up_wishbone_classic #(
+  // Module instance of up_wishbone_standard for the Wishbone Classic Standard bus to the uP bus.
+  up_wishbone_standard #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
     .BUS_WIDTH(BUS_WIDTH)
-  ) inst_up_wishbone_classic (
+  ) inst_up_wishbone_standard (
     .clk(clk),
     .rst(rst),
     .s_wb_cyc(s_wb_cyc),

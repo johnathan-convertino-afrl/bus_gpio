@@ -1,1 +1,1 @@
-﻿NDSearch.OnPrefixDataLoaded("wis",["Module","File"],[["wishbone_classic_gpio",,[[,,,,0,"File:wishbone_classic_gpio.v:wishbone_classic_gpio","SystemVerilogModule:wishbone_classic_gpio"],[,"wishbone_classic_gpio.v",,,1,"File:wishbone_classic_gpio.v:wishbone_classic_gpio.v"]]]]);
+﻿NDSearch.OnPrefixDataLoaded("wis",["Module","File"],[["wishbone_standard_gpio",,[[,,,,0,"File:wishbone_standard_gpio.v:wishbone_standard_gpio","SystemVerilogModule:wishbone_standard_gpio"],[,"wishbone_standard_gpio.v",,,1,"File:wishbone_standard_gpio.v:wishbone_standard_gpio.v"]]]]);
