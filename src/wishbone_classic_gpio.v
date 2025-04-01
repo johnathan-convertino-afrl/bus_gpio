@@ -54,8 +54,6 @@
  *   s_wb_addr      - Bus address
  *   s_wb_data_i    - Input data
  *   s_wb_sel       - Device Select
- *   s_wb_bte       - Burst Type Extension
- *   s_wb_cti       - Cycle Type
  *   s_wb_ack       - Bus transaction terminated
  *   s_wb_data_o    - Output data
  *   s_wb_err       - Active high when a bus error is present
@@ -79,8 +77,6 @@ module wishbone_classic_gpio #(
     input   [ADDRESS_WIDTH-1:0] s_wb_addr,
     input   [BUS_WIDTH*8-1:0]   s_wb_data_i,
     input   [ 3:0]              s_wb_sel,
-    input   [ 1:0]              s_wb_bte,
-    input   [ 2:0]              s_wb_cti,
     output                      s_wb_ack,
     output  [BUS_WIDTH*8-1:0]   s_wb_data_o,
     output                      s_wb_err,
@@ -133,8 +129,6 @@ module wishbone_classic_gpio #(
     .s_wb_addr(s_wb_addr),
     .s_wb_data_i(s_wb_data_i),
     .s_wb_sel(s_wb_sel),
-    .s_wb_cti(s_wb_cti),
-    .s_wb_bte(s_wb_bte),
     .s_wb_ack(s_wb_ack),
     .s_wb_data_o(s_wb_data_o),
     .s_wb_err(s_wb_err),
