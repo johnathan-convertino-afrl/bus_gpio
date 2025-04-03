@@ -3,7 +3,7 @@
 
 
 $key = q/Module_Documentation/;
-$external_labels{$key} = "$URL/" . q|bus_gpio_node24.html|; 
+$external_labels{$key} = "$URL/" . q|bus_gpio_node23.html|; 
 $noresave{$key} = "$nosave";
 
 1;

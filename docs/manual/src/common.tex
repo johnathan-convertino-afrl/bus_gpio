@@ -115,13 +115,28 @@ Below highlights important folders from the root of the directory.
 \par
 There are a few different simulations that can be run for this core.
 
-\subsection{iverilog}
-\par
-iverilog is used for simple test benches for quick verification, visually, of the core.
-
 \subsection{cocotb}
 \par
-Future simulations will use cocotb. This feature is not yet implemented.
+Cocotb is the only method for simulating the various interations of the bus\_GPIO core. At the moment there is a
+axi\_lite, wishbone\_standard, and uP based versions. This is currently set to use icarus as the sim tool for cocotb.
+
+\par
+To run the wishbone sim use the command below.
+\begin{lstlisting}[language=bash]
+fusesoc run --target sim_cocotb AFRL:device:wishbone_standard_gpio:1.0.0
+\end{lstlisting}
+
+\par
+To run the axi\_lite sim use the command below.
+\begin{lstlisting}[language=bash]
+fusesoc run --target sim_cocotb AFRL:device:axi_lite_gpio:1.0.0
+\end{lstlisting}
+
+\par
+To run the uP sim use the command below.
+\begin{lstlisting}[language=bash]
+fusesoc run --target sim_cocotb AFRL:device:up_gpio:1.0.0
+\end{lstlisting}
 
 \newpage
 

@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("res",["Function"],[["reset_dut",,[[,,,,0,"File2:tb_cocotb_axi_lite.py:reset_dut"]]]]);

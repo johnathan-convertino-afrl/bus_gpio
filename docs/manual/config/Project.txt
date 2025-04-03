@@ -86,6 +86,7 @@ Source Folder: ../../../src
 Source Folder 2: ../../../tb
    Name: bus_gpio_tb
 
+
 # This is where you tell Natural Docs which folders it should scan for source
 # files.  If you add any on the command line this section is ignored except
 # for the properties of the ones from the command line.

@@ -1,1 +1,1 @@
-﻿NDMenu.OnSectionLoaded("modules.js",[[1,"axi_lite_gpio"],[1,"inst_up_axi"],[1,"inst_up_gpio"],[1,"inst_up_wishbone_standard"],[1,"up_gpio"],[1,"wishbone_standard_gpio"]]);
+﻿NDMenu.OnSectionLoaded("modules.js",[[1,"axi_lite_gpio"],[1,"dut"],[1,"inst_up_axi"],[1,"inst_up_gpio"],[1,"inst_up_wishbone_standard"],[1,"tb_cocotb"],[1,"up_gpio"],[1,"wishbone_standard_gpio"]]);

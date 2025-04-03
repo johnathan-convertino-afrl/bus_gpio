@@ -3,7 +3,7 @@
 
 
 $key = q/Module_Documentation/;
-$ref_files{$key} = "$dir".q|bus_gpio_node24.html|; 
+$ref_files{$key} = "$dir".q|bus_gpio_node23.html|; 
 $noresave{$key} = "$nosave";
 
 1;
