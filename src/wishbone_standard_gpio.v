@@ -73,17 +73,17 @@ module wishbone_standard_gpio #(
     input           rst,
     input                       s_wb_cyc,
     input                       s_wb_stb,
-    input                       s_wb_we,
+    input                       s_wb_we,    output                      irq,
+    input   [GPIO_WIDTH-1:0]    gpio_io_i,
+    output  [GPIO_WIDTH-1:0]    gpio_io_o,
+    output  [GPIO_WIDTH-1:0]    gpio_io_t
     input   [ADDRESS_WIDTH-1:0] s_wb_addr,
     input   [BUS_WIDTH*8-1:0]   s_wb_data_i,
     input   [ 3:0]              s_wb_sel,
     output                      s_wb_ack,
     output  [BUS_WIDTH*8-1:0]   s_wb_data_o,
     output                      s_wb_err,
-    output                      irq,
-    input   [GPIO_WIDTH-1:0]    gpio_io_i,
-    output  [GPIO_WIDTH-1:0]    gpio_io_o,
-    output  [GPIO_WIDTH-1:0]    gpio_io_t
+
   );
 
   // var: up_rreq

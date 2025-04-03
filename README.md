@@ -1,5 +1,5 @@
 # BUS GPIO
-### GPIO TO BUS (WISHBONE CLASSIC, AXI_LITE)
+### GPIO TO BUS (WISHBONE STANDARD, AXI_LITE)
 
 ![image](docs/manual/img/AFRL.png)
 
@@ -31,7 +31,7 @@
 ### DEPENDENCIES
 #### Build
   - AFRL:utility:helper:1.0.0
-  - AFRL:bus:up_wishbone_classic:1.0.0 (FOR WISHBONE)
+  - AFRL:bus:up_wishbone_standard:1.0.0 (FOR WISHBONE)
   - AD:common:up_axi:1.0.0 (FOR AXI LITE)
   
 #### Simulation
@@ -63,21 +63,26 @@
 #### SRC
 
 * up_gpio.v
-* wishbone_classic_gpio.v
+* wishbone_standard_gpio.v
 * axi_lite_gpio.v
   
 #### TB
 
-* tb_up_gpio.v
-* tb_wishbone_slave.v
-  
+* tb_cocotb_up.v
+* tb_cocotb_up.py
+* tb_cocotb_axi_lite.v
+* tb_cocotb_axi_lite.py
+* tb_cocotb_wishbone_standard.v
+* tb_cocotb_wishbone_standard.py
+
 ### FUSESOC
 
 * fusesoc_info.core created.
-* Simulation uses icarus to run data through the core.
+* Simulation uses cocotb with icarus to run data through the core.
 
-#### targets
+#### Targets
 
 * RUN WITH: (fusesoc run --target=sim VENDER:CORE:NAME:VERSION)
   - default (for IP integration builds)
-  - sim
+  - sim_cocotb
+

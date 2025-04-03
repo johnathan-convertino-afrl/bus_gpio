@@ -73,6 +73,7 @@
  */
 module axi_lite_gpio #(
     parameter ADDRESS_WIDTH   = 32,
+    parameter BUS_WIDTH         = 4,
     parameter GPIO_WIDTH      = 32,
     parameter IRQ_ENABLE      = 0
   )
@@ -86,7 +87,7 @@ module axi_lite_gpio #(
     input   [ 2:0]              s_axi_awprot,
     output                      s_axi_awready,
     input                       s_axi_wvalid,
-    input   [31:0]              s_axi_wdata,
+    input   [BUS_WIDTH*8-1:0]   s_axi_wdata,
     input   [ 3:0]              s_axi_wstrb,
     output                      s_axi_wready,
     output                      s_axi_bvalid,
@@ -97,7 +98,7 @@ module axi_lite_gpio #(
     input   [ 2:0]              s_axi_arprot,
     output                      s_axi_arready,
     output                      s_axi_rvalid,
-    output  [31:0]              s_axi_rdata,
+    output  [BUS_WIDTH*8-1:0]   s_axi_rdata,
     output  [ 1:0]              s_axi_rresp,
     input                       s_axi_rready,
     output                      irq,
@@ -174,7 +175,7 @@ module axi_lite_gpio #(
   // Module instance of up_gpio.
   up_gpio #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
-    .BUS_WIDTH(4),
+    .BUS_WIDTH(BUS_WIDTH),
     .GPIO_WIDTH(GPIO_WIDTH),
     .IRQ_ENABLE(IRQ_ENABLE)
   ) inst_up_gpio (

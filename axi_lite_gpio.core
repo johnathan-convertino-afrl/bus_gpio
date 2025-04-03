@@ -19,11 +19,6 @@ filesets:
       - AFRL:utility:helper:1.0.0
       - AFRL:device:up_gpio:1.0.0
       - AD:common:up_axi:1.0.0
-      
-  dep_tb:
-    depend:
-      - AFRL:simulation:axis_stimulator
-      - AFRL:utility:sim_helper
     
 targets:
   default: &default
@@ -36,7 +31,7 @@ targets:
     flow: sim
     flow_options:
       tool: icarus
-      cocotb_module: tb_cocotb
+      cocotb_module: tb_cocotb_axi_lite
       timescale: 1ns/1ns
       vcs_options: [-timescale=1ns/1ns]
     filesets_append: [tb_cocotb]

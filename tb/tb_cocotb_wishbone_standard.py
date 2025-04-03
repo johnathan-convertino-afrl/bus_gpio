@@ -1,5 +1,5 @@
 #******************************************************************************
-# file:    tb_cocotb.py
+# file:    tb_cocotb_wishbone_standard.py
 #
 # author:  JAY CONVERTINO
 #
@@ -39,8 +39,8 @@ from cocotb.clock import Clock
 from cocotb.utils import get_sim_time
 from cocotb.triggers import FallingEdge, RisingEdge, Timer, Event
 from cocotb.binary import BinaryValue
-from cocotbext.wishbone.classic import wishboneClassicMaster
-from cocotbext.up.ad import upEchoSlave
+from cocotbext.mil_std_1553 import MILSTD1553Source, MILSTD1553Sink
+from cocotbext.wishbone.standard import wishboneStandardMaster
 
 # Function: random_bool
 # Return a infinte cycle of random bools
@@ -60,72 +60,77 @@ def random_bool():
 # Parameters:
 #   dut - Device under test passed from cocotb test function
 def start_clock(dut):
-  cocotb.start_soon(Clock(dut.clk, 2, units="ns").start())
+  dut._log.info(f'CLOCK NS : {int(1000000000/dut.CLOCK_SPEED.value)}')
+  cocotb.start_soon(Clock(dut.clk, int(1000000000/dut.CLOCK_SPEED.value), units="ns").start())
 
 # Function: reset_dut
 # Cocotb coroutine for resets, used with await to make sure system is reset.
 async def reset_dut(dut):
   dut.rst.value = 1
-  await Timer(5, units="ns")
+  await Timer(20, units="ns")
   dut.rst.value = 0
 
-# Function: increment test
-# Coroutine that is identified as a test routine. Write data, on one clock edge, read
-# on the next.
+# Function: increment_test_cmd_send
+# Coroutine that is identified as a test routine. Setup up to send 1553 commands
 #
 # Parameters:
 #   dut - Device under test passed from cocotb.
 @cocotb.test()
-async def increment_test(dut):
+async def increment_test_cmd_send(dut):
 
     start_clock(dut)
 
-    wishbone_classic_master = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
+    wishbone_master = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
 
-    up_echo_slave = upEchoSlave(dut, "up", dut.clk, dut.rstn)
+    milstd1553_sink = MILSTD1553Sink(dut.o_diff)
 
     await reset_dut(dut)
 
     for x in range(0, 2**8):
 
-        await wishbone_classic_master.write(x, x)
+        status = 0b10000001
 
-        await RisingEdge(dut.clk)
+        data = x
 
-        rx_data = await wishbone_classic_master.read(x)
+        payload = status << 16 | data
 
-        assert rx_data == x, "WRITTEN DATA DOES NOT EQUAL READ."
+        await wishbone_master.write(4, payload)
 
-    await RisingEdge(dut.clk)
+        rx_data = await milstd1553_sink.read_cmd()
 
-# Function: increment test stream
-# Coroutine that is identified as a test routine. Write data, in a stream to registers,
-# then read back stream.
+        assert int.from_bytes(rx_data, "little") == x, "SENT COMMAND OVER UP DOES NOT MATCH RECEIVED DATA"
+
+
+# Function: increment_test_cmd_recv
+# Coroutine that is identified as a test routine. Setup up to recv 1553 commands
 #
 # Parameters:
 #   dut - Device under test passed from cocotb.
 @cocotb.test()
-async def increment_test_stream(dut):
+async def increment_test_cmd_recv(dut):
 
     start_clock(dut)
 
-    wishbone_classic_master = wishboneClassicMaster(dut, "s_wb", dut.clk, dut.rst)
-
-    up_echo_slave = upEchoSlave(dut, "up", dut.clk, dut.rst)
-
     await reset_dut(dut)
 
-    for x in range(0, 2**8, dut.BUS_WIDTH.value):
+    wishbone_master = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
 
-        await wishbone_classic_master.write(x, x)
+    milstd1553_source = MILSTD1553Source(dut.i_diff)
 
-    for x in range(0, 2**8, dut.BUS_WIDTH.value):
-        rx_data = await wishbone_classic_master.read(x)
+    for x in range(0, 2**8):
 
-        assert rx_data == x, "WRITTEN DATA DOES NOT EQUAL READ."
+        data = x.to_bytes(2, byteorder="little")
 
-    await RisingEdge(dut.clk)
+        await milstd1553_source.write_cmd(data)
 
+        status_reg = await wishbone_master.read(8)
+
+        rx_data = await wishbone_master.read(0)
+
+        assert rx_data & 0x0000FFFF == x, "RECEIVED COMMAND OVER UP DOES NOT MATCH SOURCE DATA"
+        assert (rx_data >> 16) & 0xFF == 0b10000001, "RECEIVED DATA IS NOT A COMMAND OR PARITY FAILED"
+        assert (status_reg >> 7) & 1 == 1, "PARITY CHECK FAILED"
+        assert status_reg & 1 == 1, "RECEIVED DATA IS NOT VALID"
 
 # Function: in_reset
 # Coroutine that is identified as a test routine. This routine tests if device stays
@@ -136,15 +141,13 @@ async def increment_test_stream(dut):
 @cocotb.test()
 async def in_reset(dut):
 
-    start_clock(dut)
+  start_clock(dut)
 
-    dut.rst.value = 0
+  dut.rst.value = 1
 
-    await Timer(10, units="ns")
+  await Timer(100, units="ns")
 
-    assert dut.up_wack.value.integer == 0, "uP WACK is 1!"
-    assert dut.up_rack.value.integer == 0, "uP RACK is 1!"
-    assert dut.s_wb_ack.value.integer == 0, "WISHBONE ACK is 1!"
+  assert dut.s_wb_ack.value.integer == 0, "s_wb_ack is 1!"
 
 # Function: no_clock
 # Coroutine that is identified as a test routine. This routine tests if no ready when clock is lost
@@ -155,10 +158,8 @@ async def in_reset(dut):
 @cocotb.test()
 async def no_clock(dut):
 
-    dut.rst.value = 0
+  dut.rst.value = 1
 
-    await Timer(5, units="ns")
+  await Timer(100, units="ns")
 
-    assert dut.up_wack.value.integer == 0, "uP WACK is 1!"
-    assert dut.up_rack.value.integer == 0, "uP RACK is 1!"
-    assert dut.s_wb_ack.value.integer == 0, "WISHBONE ACK is 1!"
+  assert dut.s_wb_ack.value.integer == 0, "s_wb_ack is 1!"

@@ -13,11 +13,6 @@ filesets:
     files:
       - tb/tb_cocotb_up.py : {file_type : user, copyto : .}
       - tb/tb_cocotb_up.v : { file_type: verilogSource }
-  
-  tb:
-    files:
-      - tb/tb_up_gpio.v
-    file_type: verilogSource
     
   dep:
     depend:
@@ -27,13 +22,6 @@ targets:
   default: &default
     description: Default for IP intergration.
     filesets: [src, dep]
-  
-  sim: &sim
-    <<: *default
-    description: Base simulation using icarus as default.
-    default_tool: icarus
-    filesets_append: [tb]
-    toplevel: tb_up_gpio
 
   sim_cocotb:
     <<: *default
@@ -41,7 +29,7 @@ targets:
     flow: sim
     flow_options:
       tool: icarus
-      cocotb_module: tb_cocotb
+      cocotb_module: tb_cocotb_up
       timescale: 1ns/1ns
       vcs_options: [-timescale=1ns/1ns]
     filesets_append: [tb_cocotb]

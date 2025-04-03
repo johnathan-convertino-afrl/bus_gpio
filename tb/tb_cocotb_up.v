@@ -1,5 +1,5 @@
 //******************************************************************************
-// file:    tb_cocotb.v
+// file:    tb_cocotb_up.v
 //
 // author:  JAY CONVERTINO
 //
@@ -36,60 +36,53 @@
 /*
  * Module: tb_cocotb
  *
- * Wishbone Classic slave to uP up_wishbone_classic DUT
+ * uP UART testbench
  *
  * Parameters:
  *
- *   ADDRESS_WIDTH   - Width of the Wishbone address port in bits.
- *   BUS_WIDTH       - Width of the Wishbone bus data port in bytes.
+ *   ADDRESS_WIDTH   - Width of the uP address port, max 32 bit.
+ *   BUS_WIDTH       - Width of the uP bus data port.
+ *   GPIO_WIDTH      - Width of the GPIO for inputs and outputs
+ *   IRQ_ENABLE      - Enable interrupt
  *
  * Ports:
  *
- *   clk              - Clock
- *   rst              - Positive reset
- *   s_wb_cyc         - Bus Cycle in process
- *   s_wb_stb         - Valid data transfer cycle
- *   s_wb_we          - Active High write, low read
- *   s_wb_addr        - Bus address
- *   s_wb_data_i      - Input data
- *   s_wb_sel         - Device Select
- *   s_wb_ack         - Bus transaction terminated
- *   s_wb_data_o      - Output data
- *   s_wb_err         - Active high when a bus error is present
- *   up_rreq          - uP bus read request
- *   up_rack          - uP bus read ack
- *   up_raddr         - uP bus read address
- *   up_rdata         - uP bus read data
- *   up_wreq          - uP bus write request
- *   up_wack          - uP bus write ack
- *   up_waddr         - uP bus write address
- *   up_wdata         - uP bus write data
+ *   clk            - Clock for all devices in the core
+ *   rstn           - Negative reset
+ *   up_rreq        - uP bus read request
+ *   up_rack        - uP bus read ack
+ *   up_raddr       - uP bus read address
+ *   up_rdata       - uP bus read data
+ *   up_wreq        - uP bus write request
+ *   up_wack        - uP bus write ack
+ *   up_waddr       - uP bus write address
+ *   up_wdata       - uP bus write data
+ *   irq            - Interrupt when data is received
+ *   gpio_io_i      - Input for GPIO
+ *   gpio_io_o      - Output for GPIO
+ *   gpio_io_t      - Tristate for GPIO
  */
 module tb_cocotb #(
-    parameter ADDRESS_WIDTH = 16,
-    parameter BUS_WIDTH     = 4
+    parameter ADDRESS_WIDTH = 32,
+    parameter BUS_WIDTH     = 4,
+    parameter GPIO_WIDTH    = 4,
+    parameter IRQ_ENABLE    = 0
   )
   (
     input                                           clk,
-    input                                           rst,
-    output                                          rstn,
-    input                                           s_wb_cyc,
-    input                                           s_wb_stb,
-    input                                           s_wb_we,
-    input   [ADDRESS_WIDTH-1:0]                     s_wb_addr,
-    input   [BUS_WIDTH*8-1:0]                       s_wb_data_i,
-    input   [BUS_WIDTH-1:0]                         s_wb_sel,
-    output                                          s_wb_ack,
-    output  [BUS_WIDTH*8-1:0]                       s_wb_data_o,
-    output                                          s_wb_err,
-    output                                          up_rreq,
-    input                                           up_rack,
-    output  [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]       up_raddr,
-    input   [BUS_WIDTH*8-1:0]                       up_rdata,
-    output                                          up_wreq,
-    input                                           up_wack,
-    output  [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]       up_waddr,
-    output  [BUS_WIDTH*8-1:0]                       up_wdata
+    input                                           rstn,
+    input                                           up_rreq,
+    output                                          up_rack,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]       up_raddr,
+    output  [(BUS_WIDTH*8)-1:0]                     up_rdata,
+    input                                           up_wreq,
+    output                                          up_wack,
+    input   [ADDRESS_WIDTH-(BUS_WIDTH/2)-1:0]       up_waddr,
+    input   [(BUS_WIDTH*8)-1:0]                     up_wdata,
+    output                                          irq,
+    input   [GPIO_WIDTH-1:0]                        gpio_io_i,
+    output  [GPIO_WIDTH-1:0]                        gpio_io_o,
+    output  [GPIO_WIDTH-1:0]                        gpio_io_t
   );
   // fst dump command
   initial begin
@@ -98,29 +91,21 @@ module tb_cocotb #(
     #1;
   end
 
-  assign rstn = ~rst;
-  
   //Group: Instantiated Modules
 
   /*
    * Module: dut
    *
-   * Device under test, up_wishbone_classic
+   * Device under test, up_uart
    */
-  up_wishbone_classic #(
+  up_uart #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
-    .BUS_WIDTH(BUS_WIDTH)
+    .BUS_WIDTH(BUS_WIDTH),
+    .GPIO_WIDTH(GPIO_WIDTH),
+    .IRQ_ENABLE(IRQ_ENABLE)
   ) dut (
     .clk(clk),
-    .rst(rst),
-    .s_wb_cyc(s_wb_cyc),
-    .s_wb_stb(s_wb_stb),
-    .s_wb_we(s_wb_we),
-    .s_wb_addr(s_wb_addr),
-    .s_wb_data_i(s_wb_data_i),
-    .s_wb_sel(s_wb_sel),
-    .s_wb_ack(s_wb_ack),
-    .s_wb_data_o(s_wb_data_o),
+    .rstn(rstn),
     .up_rreq(up_rreq),
     .up_rack(up_rack),
     .up_raddr(up_raddr),
@@ -128,7 +113,11 @@ module tb_cocotb #(
     .up_wreq(up_wreq),
     .up_wack(up_wack),
     .up_waddr(up_waddr),
-    .up_wdata(up_wdata)
+    .up_wdata(up_wdata),
+    .irq(irq),
+    .gpio_io_i(gpio_io_i),
+    .gpio_io_o(gpio_io_o),
+    .gpio_io_t(gpio_io_t)
   );
   
 endmodule
