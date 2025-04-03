@@ -73,7 +73,7 @@
  */
 module axi_lite_gpio #(
     parameter ADDRESS_WIDTH   = 32,
-    parameter BUS_WIDTH         = 4,
+    parameter BUS_WIDTH       = 4,
     parameter GPIO_WIDTH      = 32,
     parameter IRQ_ENABLE      = 0
   )

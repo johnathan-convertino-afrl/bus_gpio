@@ -36,7 +36,7 @@
 /*
  * Module: tb_cocotb
  *
- * uP UART testbench
+ * uP GPIO testbench
  *
  * Parameters:
  *
@@ -65,7 +65,7 @@
 module tb_cocotb #(
     parameter ADDRESS_WIDTH = 32,
     parameter BUS_WIDTH     = 4,
-    parameter GPIO_WIDTH    = 4,
+    parameter GPIO_WIDTH    = 32,
     parameter IRQ_ENABLE    = 0
   )
   (
@@ -96,9 +96,9 @@ module tb_cocotb #(
   /*
    * Module: dut
    *
-   * Device under test, up_uart
+   * Device under test, up_gpio
    */
-  up_uart #(
+  up_gpio #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
     .BUS_WIDTH(BUS_WIDTH),
     .GPIO_WIDTH(GPIO_WIDTH),

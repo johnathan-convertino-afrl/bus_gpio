@@ -39,7 +39,6 @@ from cocotb.clock import Clock
 from cocotb.utils import get_sim_time
 from cocotb.triggers import FallingEdge, RisingEdge, Timer, Event
 from cocotb.binary import BinaryValue
-from cocotbext.mil_std_1553 import MILSTD1553Source, MILSTD1553Sink
 from cocotbext.wishbone.standard import wishboneStandardMaster
 
 # Function: random_bool
@@ -60,49 +59,45 @@ def random_bool():
 # Parameters:
 #   dut - Device under test passed from cocotb test function
 def start_clock(dut):
-  dut._log.info(f'CLOCK NS : {int(1000000000/dut.CLOCK_SPEED.value)}')
-  cocotb.start_soon(Clock(dut.clk, int(1000000000/dut.CLOCK_SPEED.value), units="ns").start())
+  cocotb.start_soon(Clock(dut.clk, 2, units="ns").start())
 
 # Function: reset_dut
 # Cocotb coroutine for resets, used with await to make sure system is reset.
 async def reset_dut(dut):
   dut.rst.value = 1
-  await Timer(20, units="ns")
+  await Timer(100, units="ns")
   dut.rst.value = 0
 
-# Function: increment_test_cmd_send
-# Coroutine that is identified as a test routine. Setup up to send 1553 commands
+# Function: increment_test_write
+# Coroutine that is identified as a test routine. Setup up to write to gpio
 #
 # Parameters:
 #   dut - Device under test passed from cocotb.
 @cocotb.test()
-async def increment_test_cmd_send(dut):
+async def increment_test_write(dut):
 
     start_clock(dut)
 
+    await reset_dut(dut)
+
     wishbone_master = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
 
-    milstd1553_sink = MILSTD1553Sink(dut.o_diff)
-
-    await reset_dut(dut)
+    await wishbone_master.write(4, 0)
 
     for x in range(0, 2**8):
 
-        status = 0b10000001
+        await wishbone_master.write(0, x)
 
-        data = x
+        data = dut.gpio_io_o.value.integer
 
-        payload = status << 16 | data
+        tri  = dut.gpio_io_t.value.integer
 
-        await wishbone_master.write(4, payload)
-
-        rx_data = await milstd1553_sink.read_cmd()
-
-        assert int.from_bytes(rx_data, "little") == x, "SENT COMMAND OVER UP DOES NOT MATCH RECEIVED DATA"
+        assert data == x, "SENT DATA OVER UP DOES NOT MATCH GPIO DATA"
+        assert tri  == 0, "TRISTATE IS NOT 0 FOR OUTPUT"
 
 
-# Function: increment_test_cmd_recv
-# Coroutine that is identified as a test routine. Setup up to recv 1553 commands
+# Function: increment_test_read
+# Coroutine that is identified as a test routine. Setup up read gpio
 #
 # Parameters:
 #   dut - Device under test passed from cocotb.
@@ -115,22 +110,18 @@ async def increment_test_cmd_recv(dut):
 
     wishbone_master = wishboneStandardMaster(dut, "s_wb", dut.clk, dut.rst)
 
-    milstd1553_source = MILSTD1553Source(dut.i_diff)
+    await wishbone_master.write(4, ~0)
 
     for x in range(0, 2**8):
 
-        data = x.to_bytes(2, byteorder="little")
+        dut.gpio_io_i.value = x
 
-        await milstd1553_source.write_cmd(data)
+        data = await wishbone_master.read(0)
 
-        status_reg = await wishbone_master.read(8)
+        tri  = dut.gpio_io_t.value.integer
 
-        rx_data = await wishbone_master.read(0)
-
-        assert rx_data & 0x0000FFFF == x, "RECEIVED COMMAND OVER UP DOES NOT MATCH SOURCE DATA"
-        assert (rx_data >> 16) & 0xFF == 0b10000001, "RECEIVED DATA IS NOT A COMMAND OR PARITY FAILED"
-        assert (status_reg >> 7) & 1 == 1, "PARITY CHECK FAILED"
-        assert status_reg & 1 == 1, "RECEIVED DATA IS NOT VALID"
+        assert data == x, "SENT DATA OVER DOES NOT MATCH GPIO DATA"
+        assert tri  == 0xFFFFFFFF, "TRISTATE IS NOT ALL 1's FOR INPUT"
 
 # Function: in_reset
 # Coroutine that is identified as a test routine. This routine tests if device stays

@@ -36,7 +36,7 @@
 /*
  * Module: tb_cocotb
  *
- * Wishbone Stanard based UART communications device.
+ * Wishbone Stanard based GPIO communications device.
  *
  * Parameters:
  *
@@ -66,18 +66,18 @@
 module tb_cocotb #(
     parameter ADDRESS_WIDTH = 32,
     parameter BUS_WIDTH     = 4,
-    parameter GPIO_WIDTH    = 4,
+    parameter GPIO_WIDTH    = 32,
     parameter IRQ_ENABLE    = 0
   )
   (
-    input           clk,
-    input           rst,
+    input                       clk,
+    input                       rst,
     input                       s_wb_cyc,
     input                       s_wb_stb,
     input                       s_wb_we,
     input   [ADDRESS_WIDTH-1:0] s_wb_addr,
     input   [BUS_WIDTH*8-1:0]   s_wb_data_i,
-    input   [ 3:0]              s_wb_sel,
+    input   [BUS_WIDTH-1:0]     s_wb_sel,
     output                      s_wb_ack,
     output  [BUS_WIDTH*8-1:0]   s_wb_data_o,
     output                      s_wb_err,
@@ -99,9 +99,9 @@ module tb_cocotb #(
   /*
    * Module: dut
    *
-   * Device under test, wishbone_standard_uart
+   * Device under test, wishbone_standard_gpio
    */
-  wishbone_standard_uart #(
+  wishbone_standard_gpio #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
     .BUS_WIDTH(BUS_WIDTH),
     .GPIO_WIDTH(GPIO_WIDTH),

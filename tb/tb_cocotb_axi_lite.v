@@ -36,7 +36,7 @@
 /*
  * Module: tb_cocotb
  *
- * AXI Lite slave to AXI Lite UART DUT
+ * AXI Lite slave to AXI Lite gpio DUT
  *
  * Parameters:
  *
@@ -76,7 +76,7 @@
 module tb_cocotb #(
     parameter ADDRESS_WIDTH     = 32,
     parameter BUS_WIDTH         = 4,
-    parameter GPIO_WIDTH        = 4,
+    parameter GPIO_WIDTH        = 32,
     parameter IRQ_ENABLE        = 0
   )
   (
@@ -118,9 +118,9 @@ module tb_cocotb #(
   /*
    * Module: dut
    *
-   * Device under test, axi_lite_uart
+   * Device under test, axi_lite_gpio
    */
-  axi_lite_uart #(
+  axi_lite_gpio #(
     .ADDRESS_WIDTH(ADDRESS_WIDTH),
     .BUS_WIDTH(BUS_WIDTH),
     .GPIO_WIDTH(GPIO_WIDTH),

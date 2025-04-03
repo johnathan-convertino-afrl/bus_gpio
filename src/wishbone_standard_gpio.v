@@ -69,20 +69,21 @@ module wishbone_standard_gpio #(
     parameter IRQ_ENABLE      = 0
   )
   (
-    input           clk,
-    input           rst,
+    input                       clk,
+    input                       rst,
     input                       s_wb_cyc,
     input                       s_wb_stb,
-    input                       s_wb_we,    output                      irq,
-    input   [GPIO_WIDTH-1:0]    gpio_io_i,
-    output  [GPIO_WIDTH-1:0]    gpio_io_o,
-    output  [GPIO_WIDTH-1:0]    gpio_io_t
+    input                       s_wb_we,
     input   [ADDRESS_WIDTH-1:0] s_wb_addr,
     input   [BUS_WIDTH*8-1:0]   s_wb_data_i,
-    input   [ 3:0]              s_wb_sel,
+    input   [BUS_WIDTH-1:0]     s_wb_sel,
     output                      s_wb_ack,
     output  [BUS_WIDTH*8-1:0]   s_wb_data_o,
     output                      s_wb_err,
+    output                      irq,
+    input   [GPIO_WIDTH-1:0]    gpio_io_i,
+    output  [GPIO_WIDTH-1:0]    gpio_io_o,
+    output  [GPIO_WIDTH-1:0]    gpio_io_t
 
   );
 
@@ -151,8 +152,8 @@ module wishbone_standard_gpio #(
     .GPIO_WIDTH(GPIO_WIDTH),
     .IRQ_ENABLE(IRQ_ENABLE)
   ) inst_up_gpio (
-    .clk(aclk),
-    .rstn(arstn),
+    .clk(clk),
+    .rstn(~rst),
     .up_rreq(up_rreq),
     .up_rack(up_rack),
     .up_raddr(up_raddr),

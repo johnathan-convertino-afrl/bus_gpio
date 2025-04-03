@@ -155,8 +155,8 @@ module up_gpio #(
   //output signals assigned to registers.
   assign gpio_io_o = r_gpio_o;
   assign gpio_io_t = r_gpio_tri;
-  assign up_rack   = r_up_rack & up_rreq;
-  assign up_wack   = r_up_wack & up_wreq;
+  assign up_rack   = r_up_rack;
+  assign up_wack   = r_up_wack;
   assign up_rdata  = r_up_rdata;
   assign irq       = r_irq;
 
@@ -182,9 +182,11 @@ module up_gpio #(
 
       r_ch1_irq_status  <= r_irq;
 
+
+      r_up_rack <= up_rreq;
+
       if(up_rreq == 1'b1)
       begin
-        r_up_rack <= 1'b1;
 
         case(up_raddr[11:0])
           GPIO_DATA: begin
@@ -217,34 +219,32 @@ module up_gpio #(
         endcase
       end
 
+      r_up_wack <= up_wreq;
+
       if(up_wreq == 1'b1)
       begin
-        r_up_wack <= 1'b1;
-
-        if(r_up_wack == 1'b1) begin
-          case(up_waddr[11:0])
-            GPIO_DATA: begin
-              r_gpio_o  <= up_wdata[GPIO_WIDTH-1:0] & ~r_gpio_tri;
+        case(up_waddr[11:0])
+          GPIO_DATA: begin
+            r_gpio_o  <= up_wdata[GPIO_WIDTH-1:0] & ~r_gpio_tri;
+          end
+          GPIO_TRI: begin
+            r_gpio_tri <= up_wdata[GPIO_WIDTH-1:0];
+          end
+          GIER: begin
+            r_gie <= up_wdata[31] & IRQ_ENABLE;
+          end
+          IP_IER: begin
+            r_ch1_irq_ena <= up_wdata[0] & IRQ_ENABLE;
+          end
+          IP_ISR: begin
+            if((up_wdata[0] == 1'b1) && IRQ_ENABLE)
+            begin
+              r_ch1_irq_status <= ~r_ch1_irq_status;
             end
-            GPIO_TRI: begin
-              r_gpio_tri <= up_wdata[GPIO_WIDTH-1:0];
-            end
-            GIER: begin
-              r_gie <= up_wdata[31] & IRQ_ENABLE;
-            end
-            IP_IER: begin
-              r_ch1_irq_ena <= up_wdata[0] & IRQ_ENABLE;
-            end
-            IP_ISR: begin
-              if((up_wdata[0] == 1'b1) && IRQ_ENABLE)
-              begin
-                r_ch1_irq_status <= ~r_ch1_irq_status;
-              end
-            end
-            default:begin
-            end
-          endcase
-        end
+          end
+          default:begin
+          end
+        endcase
       end
     end
   end
