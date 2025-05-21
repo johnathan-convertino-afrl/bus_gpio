@@ -5,14 +5,19 @@
 
 ---
 
-   author: Jay Convertino   
+  author: Jay Convertino   
+  
+  date: 2024.07.25
+  
+  details: Interface GPIO to a AXI LITE or Wishbone interface bus, duplicates Xilinx AXI GPIO registers and behavior.
+  
+  license: MIT   
    
-   date: 2024.07.25
-   
-   details: Interface GPIO to a AXI LITE or Wishbone interface bus, duplicates Xilinx AXI GPIO registers and behavior.
-   
-   license: MIT   
-   
+  Actions:  
+
+  [![Lint Status](../../actions/workflows/lint.yml/badge.svg)](../../actions)  
+  [![Manual Status](../../actions/workflows/manual.yml/badge.svg)](../../actions)  
+  
 ---
 
 ### Version
@@ -27,15 +32,6 @@
 
   - [bus_gpio.pdf](docs/manual/bus_gpio.pdf)
   - [github page](https://johnathan-convertino-afrl.github.io/bus_gpio/)
-
-### DEPENDENCIES
-#### Build
-  - AFRL:utility:helper:1.0.0
-  - AFRL:bus:up_wishbone_standard:1.0.0 (FOR WISHBONE)
-  - AD:common:up_axi:1.0.0 (FOR AXI LITE)
-  
-#### Simulation
-  - AFRL:simulation:axis_stimulator
 
 ### PARAMETERS
 
@@ -84,5 +80,6 @@
 
 * RUN WITH: (fusesoc run --target=sim VENDER:CORE:NAME:VERSION)
   - default (for IP integration builds)
+  - lint
   - sim_cocotb
 

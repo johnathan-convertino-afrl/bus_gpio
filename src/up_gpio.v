@@ -36,7 +36,7 @@
 /*
  * Module: up_gpio
  *
- * uP based GPIO device.
+ * uP based GPIO device that emulates Xilinx GPIO core.
  *
  * Parameters:
  *
