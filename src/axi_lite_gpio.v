@@ -80,8 +80,6 @@ module axi_lite_gpio #(
   (
     input                       aclk,
     input                       arstn,
-    input                       s_axi_aclk,
-    input                       s_axi_aresetn,
     input                       s_axi_awvalid,
     input   [ADDRESS_WIDTH-1:0] s_axi_awaddr,
     input   [ 2:0]              s_axi_awprot,
